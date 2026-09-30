@@ -1,0 +1,10 @@
+{
+  "name": "serendipity-lab",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test model.test.js",
+    "start": "python3 -m http.server 4173 --directory dist",
+    "research": "node run-study.mjs"
+  }
+}

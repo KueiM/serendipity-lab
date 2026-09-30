@@ -1,0 +1,11 @@
+import {mkdir,writeFile} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {runStudy,csv} from './dist/experiments.js';
+import {config} from './dist/model.js';
+const seed=Number(process.argv[2]??42),n=Number(process.argv[3]??300),directory=resolve(process.argv[4]??'research-output');
+if(!Number.isInteger(seed)||seed<1||seed>999999||!Number.isInteger(n)||n<10||n>1000)throw Error('Usage: node run-study.mjs [seed:1..999999] [worlds:10..1000] [output directory]');
+const result=runStudy({seed,n,env:'balanced',a:[34,33,33],b:[100,0,0],c:config()});
+await mkdir(directory,{recursive:true});
+await writeFile(resolve(directory,`study-analysis-${result.analysisVersion}-${seed}.json`),JSON.stringify(result,null,2));
+await writeFile(resolve(directory,`study-analysis-${result.analysisVersion}-${seed}.csv`),csv(result));
+console.log(JSON.stringify({directory,model:result.modelVersion,analysis:result.analysisVersion,patterns:result.patterns.map(p=>({name:p.name,status:p.status.label})),conditions:result.groups.length,worldsPerCondition:n,A:result.groups[0].summary,B:result.groups[1].summary,ablations:result.ablations,selected:result.selection},null,2));
